@@ -20,13 +20,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install telethon
+          pip install telethon requests
 
-      - name: Run bot
+      - name: Run Bots
         env:
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
           TG_SESSION_STRING: ${{ secrets.TG_SESSION_STRING }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python run_bot.py
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+        run: |
+          python run_bot.py
+          python run_us_bot.py
