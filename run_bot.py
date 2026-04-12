@@ -2,7 +2,7 @@ import asyncio
 import os
 from datetime import datetime, timedelta, timezone
 from telethon import TelegramClient
-from telethon.tl.types import MessageEntityUrl, MessageEntityTextUrl
+from telethon.sessions import StringSession
 
 # GitHub Secrets에서 가져올 설정값들
 API_ID         = int(os.environ["TG_API_ID"])
@@ -21,14 +21,14 @@ CATEGORIES = {
 
 def classify(text: str) -> str | None:
     for cat_key, cat in CATEGORIES.items():
-        if any(kw in text for kw in cat["keywords"]): return cat_key
+        if any(kw in text for kw in cat["keywords"]): 
+            return cat_key
     return None
 
 def clean_text(text: str) -> str:
     return text[:250] + "…" if len(text) > 250 else text
 
 async def main():
-    from telethon.sessions import StringSession
     KST = timezone(timedelta(hours=9))
     now_kst = datetime.now(KST)
     since_dt = now_kst - timedelta(hours=24)
@@ -43,10 +43,13 @@ async def main():
     buffer = defaultdict(list)
 
     async for msg in user_client.iter_messages(SOURCE_CHANNEL, limit=300):
-        if not msg.text: continue
-        if msg.date.astimezone(KST) < since_dt: break
+        if not msg.text: 
+            continue
+        if msg.date.astimezone(KST) < since_dt: 
+            break
         cat = classify(msg.text)
-        if cat: buffer[cat].append(msg.text)
+        if cat: 
+            buffer[cat].append(msg.text)
 
     total = sum(len(v) for v in buffer.values())
     today_str = now_kst.strftime("%Y년 %m월 %d일")
@@ -54,3 +57,18 @@ async def main():
     if total == 0:
         await bot_client.send_message(MY_CHAT_ID, f"📭 <b>{today_str} 공시 요약</b>\n수집된 공시가 없습니다.", parse_mode="html")
     else:
+        await bot_client.send_message(MY_CHAT_ID, f"📋 <b>{today_str} 공시 일일 요약</b>\n총 <b>{total}건</b> 수집\n{'─'*28}", parse_mode="html")
+        for cat_key, cat in CATEGORIES.items():
+            items = buffer.get(cat_key, [])
+            if items:
+                msg_text = f"{cat['label']} <b>({len(items)}건)</b>\n\n" + "\n\n".join(f"• {clean_text(t)}" for t in items)
+            else:
+                msg_text = f"{cat['label']}\n없음"
+            await bot_client.send_message(MY_CHAT_ID, msg_text, parse_mode="html", link_preview=False)
+            await asyncio.sleep(0.5)
+
+    await user_client.disconnect()
+    await bot_client.disconnect()
+
+if __name__ == "__main__":
+    asyncio.run(main())
