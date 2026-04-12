@@ -1,10 +1,11 @@
 import asyncio
 import os
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 
-# GitHub Secrets에서 가져올 설정값들
+# GitHub Secrets 설정값
 API_ID         = int(os.environ["TG_API_ID"])
 API_HASH       = os.environ["TG_API_HASH"]
 BOT_TOKEN      = os.environ["TELEGRAM_BOT_TOKEN"]
@@ -19,13 +20,13 @@ CATEGORIES = {
     "투자": {"label": "💰 투자 공시", "keywords": ["투자", "출자", "지분 취득", "인수", "M&A", "타법인 주식"]},
 }
 
-def classify(text: str) -> str | None:
+def classify(text: str):
     for cat_key, cat in CATEGORIES.items():
         if any(kw in text for kw in cat["keywords"]): 
             return cat_key
     return None
 
-def clean_text(text: str) -> str:
+def clean_text(text: str):
     return text[:250] + "…" if len(text) > 250 else text
 
 async def main():
