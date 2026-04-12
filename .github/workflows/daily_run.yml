@@ -1,0 +1,32 @@
+name: Daily Gongsi Summary
+
+on:
+  schedule:
+    # 매일 아침 8시(한국 시간)에 실행 (UTC 23:00)
+    - cron: '0 23 * * *'
+  workflow_dispatch: # 수동으로 즉시 실행하고 싶을 때 사용
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install telethon
+
+      - name: Run bot
+        env:
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+          TG_SESSION_STRING: ${{ secrets.TG_SESSION_STRING }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python run_bot.py
