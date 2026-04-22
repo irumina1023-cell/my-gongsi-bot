@@ -1,7 +1,6 @@
 import asyncio
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Optional
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 
@@ -14,7 +13,9 @@ SESSION_STRING = os.environ["TG_SESSION_STRING"]
 
 SOURCE_CHANNEL = "@darthacking"
 
+# 💡 '1분기'를 빼고 '실적 발표'로 범용성을 높였습니다.
 CATEGORIES = {
+    "실적": {"label": "📈 실적 발표", "keywords": ["영업실적", "잠정실적", "결산실적", "실적발표"]},
     "변동": {"label": "📊 30% 변동 공시", "keywords": ["30%", "30 %", "매출액 또는 손익구조", "영업손실 전환", "흑자전환", "적자전환"]},
     "수주": {"label": "🏗 수주 공시", "keywords": ["수주", "계약 체결", "공급계약", "납품계약", "단일판매"]},
     "투자": {"label": "💰 투자 공시", "keywords": ["투자", "출자", "지분 취득", "인수", "M&A", "타법인 주식"]},
