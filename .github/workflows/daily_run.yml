@@ -2,9 +2,9 @@ name: Korea Gongsi Summary
 
 on:
   schedule:
-    # 매일 아침 8시(한국 시간)에 실행 (UTC 기준 23시)
+    # 한국 시간 아침 8시 = UTC 23:00 (전날)
     - cron: '0 23 * * *'
-  workflow_dispatch:
+  workflow_dispatch: # 수동 실행 버튼
 
 jobs:
   build:
@@ -19,16 +19,14 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: |
-          pip install telethon
+        run: pip install telethon
 
       - name: Run Korea Bot
         env:
-          TZ: Asia/Seoul
+          TZ: Asia/Seoul # 로봇의 몸 시계를 한국으로 고정
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
           TG_SESSION_STRING: ${{ secrets.TG_SESSION_STRING }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          python run_bot.py
+        run: python run_bot.py
