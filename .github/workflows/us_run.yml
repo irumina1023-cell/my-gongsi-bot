@@ -2,7 +2,8 @@ name: US Gongsi Summary
 
 on:
   schedule:
-    - cron: '0 0 * * *' # 한국 시간 아침 9시
+    # 한국 시간 아침 9시 = UTC 00:00
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
@@ -11,14 +12,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+
       - name: Install dependencies
         run: pip install telethon requests
+
       - name: Run US Bot
         env:
+          TZ: Asia/Seoul
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
           TG_SESSION_STRING: ${{ secrets.TG_SESSION_STRING }}
